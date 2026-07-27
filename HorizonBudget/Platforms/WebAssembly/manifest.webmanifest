@@ -1,0 +1,10 @@
+{
+  "background_color": "#ffffff",
+  "description": "HorizonBudget",
+  "display": "standalone",
+  "name": "HorizonBudget",
+  "short_name": "HorizonBudget",
+  "start_url": "/index.html",
+  "theme_color": "#ffffff",
+  "scope": "/"
+}
