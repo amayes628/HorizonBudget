@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<linker>
+    <!-- Preserve all record entities in HorizonBudget.Data.Records -->
+    <assembly fullname="HorizonBudget.Data">
+        <namespace fullname="HorizonBudget.Data.Records" preserve="all"/>
+    </assembly>
+
+    <!-- Preserve Uno.Extensions.Localization internals to silence IL2026 -->
+    <assembly fullname="Uno.Extensions.Localization">
+        <namespace fullname="Uno.Extensions.Localization" preserve="all"/>
+    </assembly>
+
+    <!-- Preserve System.ComponentModel converters used by Uno -->
+    <assembly fullname="System.ComponentModel.TypeConverter">
+        <type fullname="System.ComponentModel.TypeDescriptor" preserve="all"/>
+    </assembly>
+</linker>
+

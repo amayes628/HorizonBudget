@@ -1,3 +1,3 @@
 namespace HorizonBudget.Models;
 
-public record Entity(string Name);
+public record Entity(string name);

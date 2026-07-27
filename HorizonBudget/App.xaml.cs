@@ -1,5 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
-using Uno.Resizetizer;
+using HorizonBudget.Data;
+using HorizonBudget.Data.Records;
+using HorizonBudget.Services;
+using HorizonBudget.Views;
+using Microsoft.EntityFrameworkCore;
 
 namespace HorizonBudget;
 
@@ -11,83 +15,82 @@ public partial class App : Application
     /// </summary>
     public App()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 
     protected Window? MainWindow { get; private set; }
     protected IHost? Host { get; private set; }
 
-    [SuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "Uno.Extensions APIs are used in a way that is safe for trimming in this template context.")]
-    protected async override void OnLaunched(LaunchActivatedEventArgs args)
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(
+    "Trimming", "IL2026",
+    Justification = "Uno.Extensions.Localization is safe in HorizonBudget; required converters are preserved.")]
+    protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
+        // Build host (logging, config, localization, DI)
         var builder = this.CreateBuilder(args)
-            // Add navigation support for toolkit controls such as TabBar and NavigationView
-            .UseToolkitNavigation()
             .Configure(host => host
 #if DEBUG
-                // Switch to Development environment when running in DEBUG
                 .UseEnvironment(Environments.Development)
 #endif
-                .UseLogging(configure: (context, logBuilder) =>
+                .UseLogging((context, logBuilder) =>
                 {
-                    // Configure log levels for different categories of logging
                     logBuilder
                         .SetMinimumLevel(
                             context.HostingEnvironment.IsDevelopment() ?
                                 LogLevel.Information :
                                 LogLevel.Warning)
-
-                        // Default filters for core Uno Platform namespaces
                         .CoreLogLevel(LogLevel.Warning);
+                })
 
-                    // Uno Platform namespace filter groups
-                    // Uncomment individual methods to see more detailed logging
-                    //// Generic Xaml events
-                    //logBuilder.XamlLogLevel(LogLevel.Debug);
-                    //// Layout specific messages
-                    //logBuilder.XamlLayoutLogLevel(LogLevel.Debug);
-                    //// Storage messages
-                    //logBuilder.StorageLogLevel(LogLevel.Debug);
-                    //// Binding related messages
-                    //logBuilder.XamlBindingLogLevel(LogLevel.Debug);
-                    //// Binder memory references tracking
-                    //logBuilder.BinderMemoryReferenceLogLevel(LogLevel.Debug);
-                    //// DevServer and HotReload related
-                    //logBuilder.HotReloadCoreLogLevel(LogLevel.Information);
-                    //// Debug JS interop
-                    //logBuilder.WebAssemblyLogLevel(LogLevel.Debug);
-
-                }, enableUnoLogging: true)
-                .UseConfiguration(configure: configBuilder =>
-                    configBuilder
-                        .EmbeddedSource<App>()
-                        .Section<AppConfig>()
-                )
-                // Enable localization (see appsettings.json for supported languages)
                 .UseLocalization()
                 .UseHttp((context, services) =>
                 {
 #if DEBUG
-                // DelegatingHandler will be automatically injected
-                services.AddTransient<DelegatingHandler, DebugHttpHandler>();
+                    services.AddTransient<DelegatingHandler, DebugHttpHandler>();
 #endif
-
                 })
                 .ConfigureServices((context, services) =>
                 {
-                    // TODO: Register your services
-                    //services.AddSingleton<IMyService, MyService>();
+                    services.AddDbContextFactory<HorizonBudgetContext>(options =>
+                    {
+                        options.UseSqlite("Data Source=horizon.db");
+                    });
+                    services.AddTransient<DatabaseInitializer>();
+                    // Services
+                    services.AddSingleton<ICultureService, CultureService>();
+                    //services.AddSingleton<IRecordRepository<Account>, AccountRepository>();
+
+                    // Factories
+                    services.AddSingleton<CategoryLookupFactory>();
                 })
-                .UseNavigation(ReactiveViewModelMappings.ViewModelMappings, RegisterRoutes)
             );
+
+        // Create the window
         MainWindow = builder.Window;
 
 #if DEBUG
         MainWindow.UseStudio();
 #endif
-        MainWindow.SetWindowIcon();
 
-        Host = await builder.NavigateAsync<Shell>();
+        MainWindow.SetWindowIcon();
+        // start up tasks
+        // Build the app/ host
+        var app = builder.Build();
+
+        // Correct DI scope
+        using (var scope = app.Services.CreateScope())
+        {
+            var initializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
+            initializer.Initialize();
+        }
+        // YOUR ROOT UI PAGE
+        var homePage = new HomePage();
+
+        // Assign root page to window
+        MainWindow.Content = homePage;
+
+        // Activate window
+        MainWindow.Activate();
     }
 
     private static void RegisterRoutes(IViewRegistry views, IRouteRegistry routes)

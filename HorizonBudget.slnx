@@ -6,6 +6,7 @@
     <File Path="Directory.Packages.props" />
     <File Path="global.json" />
   </Folder>
+  <Project Path="HorizonBudget.Data/HorizonBudget.Data.csproj" Id="ac24f34e-258c-490c-9638-b1322b3a218d" />
   <Project Path="HorizonBudget/HorizonBudget.csproj">
     <Deploy />
   </Project>
