@@ -1,0 +1,8 @@
+{
+  "category":{
+    "account.chequing": "Chequing",
+    "account.savings": "Savings",
+    "expense.food": "Food",
+    "expense.rent": "Rent"
+  }
+}

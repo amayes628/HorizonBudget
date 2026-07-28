@@ -1,0 +1,418 @@
+[
+  {
+    "code": "00000000",
+    "key": "Undefined",
+    "children": []
+  },
+
+  {
+    "code": "01000000",
+    "key": "Assets",
+    "children": [
+      {
+        "code": "01010000",
+        "key": "Chequing",
+        "children": []
+      },
+      {
+        "code": "01020000",
+        "key": "Savings",
+        "children": []
+      },
+      {
+        "code": "01030000",
+        "key": "Equity",
+        "children": []
+      },
+      {
+        "code": "01040000",
+        "key": "Cash Equivalents",
+        "children": []
+      },
+      {
+        "code": "01050000",
+        "key": "Investments",
+        "children": []
+      },
+      {
+        "code": "01060000",
+        "key": "Cash On Hand",
+        "children": []
+      }
+    ]
+  },
+
+  {
+    "code": "02000000",
+    "key": "Liabilities",
+    "children": [
+      {
+        "code": "02010000",
+        "key": "Accounts Payable",
+        "children": []
+      },
+      {
+        "code": "02020000",
+        "key": "Accrued Expense",
+        "children": []
+      },
+      {
+        "code": "02030000",
+        "key": "Taxes Payable",
+        "children": []
+      },
+      {
+        "code": "02040000",
+        "key": "Short Term Debt",
+        "children": []
+      }
+    ]
+  },
+
+  {
+    "code": "03000000",
+    "key": "Income",
+    "children": [
+      {
+        "code": "03010000",
+        "key": "Paid Employment",
+        "children": []
+      },
+      {
+        "code": "03020000",
+        "key": "Self-Employment",
+        "children": []
+      },
+      {
+        "code": "03030000",
+        "key": "Investment Income",
+        "children": []
+      },
+      {
+        "code": "03040000",
+        "key": "Pension Income",
+        "children": []
+      },
+      {
+        "code": "03050000",
+        "key": "Social Benefits",
+        "children": []
+      },
+      {
+        "code": "03060000",
+        "key": "Other Income",
+        "children": []
+      }
+    ]
+  },
+
+  {
+    "code": "04000000",
+    "key": "Expenses",
+    "children": [
+      {
+        "code": "04010000",
+        "key": "Housing",
+        "children": [
+          {
+            "code": "04010100",
+            "key": "Mortgage",
+            "children": []
+          },
+          {
+            "code": "04010200",
+            "key": "Rent",
+            "children": []
+          },
+          {
+            "code": "04010300",
+            "key": "Property Taxes",
+            "children": []
+          },
+          {
+            "code": "04010400",
+            "key": "Strata - Condo Fees",
+            "children": []
+          }
+        ]
+      },
+
+      {
+        "code": "04020000",
+        "key": "Utilities",
+        "children": [
+          {
+            "code": "04020100",
+            "key": "Electricity",
+            "children": []
+          },
+          {
+            "code": "04020200",
+            "key": "Heating",
+            "children": []
+          },
+          {
+            "code": "04020300",
+            "key": "Water",
+            "children": []
+          },
+          {
+            "code": "04020400",
+            "key": "Sewer",
+            "children": []
+          },
+          {
+            "code": "04020500",
+            "key": "Waste, Recycle, Garbage Disposal",
+            "children": []
+          }
+        ]
+      },
+
+      {
+        "code": "04030000",
+        "key": "Home Services",
+        "children": [
+          {
+            "code": "04030100",
+            "key": "Internet",
+            "children": []
+          },
+          {
+            "code": "04030200",
+            "key": "Mobile",
+            "children": []
+          },
+          {
+            "code": "04030300",
+            "key": "Wired Phone",
+            "children": []
+          },
+          {
+            "code": "04030400",
+            "key": "Cable-Optic TV",
+            "children": []
+          }
+        ]
+      },
+
+      {
+        "code": "04040000",
+        "key": "Home Maintenance",
+        "children": [
+          {
+            "code": "04040100",
+            "key": "Heating",
+            "children": []
+          },
+          {
+            "code": "04040200",
+            "key": "Cooling",
+            "children": []
+          },
+          {
+            "code": "04040300",
+            "key": "Lawn - Garden",
+            "children": []
+          },
+          {
+            "code": "04040400",
+            "key": "Exterior",
+            "children": []
+          },
+          {
+            "code": "04040500",
+            "key": "Interior",
+            "children": []
+          }
+        ]
+      },
+
+      {
+        "code": "04050000",
+        "key": "Food - Daily Living",
+        "children": [
+          {
+            "code": "04050100",
+            "key": "Groceries - Non-prescription",
+            "children": []
+          },
+          {
+            "code": "04050200",
+            "key": "Dining Out",
+            "children": []
+          },
+          {
+            "code": "04050300",
+            "key": "Personal Care",
+            "children": []
+          }
+        ]
+      },
+
+      {
+        "code": "04060000",
+        "key": "Transportation",
+        "children": [
+          {
+            "code": "04060100",
+            "key": "Private Transit",
+            "children": [
+              {
+                "code": "04060101",
+                "key": "Financing",
+                "children": []
+              },
+              {
+                "code": "04060102",
+                "key": "Fuel",
+                "children": []
+              },
+              {
+                "code": "04060103",
+                "key": "Maintenance",
+                "children": []
+              },
+              {
+                "code": "04060104",
+                "key": "Parking",
+                "children": []
+              }
+            ]
+          },
+          {
+            "code": "04060200",
+            "key": "Public Transit",
+            "children": []
+          },
+          {
+            "code": "04060300",
+            "key": "Vehicle Protection",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    "code": "05000000",
+    "key": "Health-Insurance",
+    "children": [
+      {
+        "code": "05010000",
+        "key": "Healthcare",
+        "children": [
+          {
+            "code": "05010100",
+            "key": "Non-reimbursed Prescriptions",
+            "children": []
+          },
+          {
+            "code": "05010200",
+            "key": "Dental",
+            "children": []
+          },
+          {
+            "code": "05010300",
+            "key": "Eye Care",
+            "children": []
+          },
+          {
+            "code": "05010400",
+            "key": "Professional Services",
+            "children": []
+          },
+          {
+            "code": "05010500",
+            "key": "Emergency Services",
+            "children": []
+          }
+        ]
+      },
+      {
+        "code": "05020000",
+        "key": "Life",
+        "children": []
+      },
+      {
+        "code": "05030000",
+        "key": "Disability",
+        "children": []
+      },
+      {
+        "code": "05040000",
+        "key": "Home-Property",
+        "children": []
+      },
+      {
+        "code": "05050000",
+        "key": "Renters",
+        "children": []
+      },
+      {
+        "code": "05060000",
+        "key": "Travel",
+        "children": []
+      }
+    ]
+  },
+
+  {
+    "code": "06000000",
+    "key": "Lifestyle",
+    "children": [
+      {
+        "code": "06010000",
+        "key": "Debt Repayment",
+        "children": [
+          {
+            "code": "06010100",
+            "key": "Credit Card Balances",
+            "children": []
+          },
+          {
+            "code": "06010200",
+            "key": "Student Loans",
+            "children": []
+          },
+          {
+            "code": "06010300",
+            "key": "Lines of Credit",
+            "children": []
+          }
+        ]
+      },
+      {
+        "code": "06020000",
+        "key": "Tax Free Savings",
+        "children": []
+      },
+      {
+        "code": "06030000",
+        "key": "Registered Retirement Savings Plan",
+        "children": []
+      },
+      {
+        "code": "06040000",
+        "key": "Registered Retirement Income Fund",
+        "children": []
+      },
+      {
+        "code": "06050000",
+        "key": "Super Annuation",
+        "children": []
+      },
+      {
+        "code": "06060000",
+        "key": "401(k)/403(b)",
+        "children": []
+      }
+    ]
+  },
+  {
+    "code": "FFFFFFFF",
+    "key": "All Categories",
+    "children": []
+  }
+]
