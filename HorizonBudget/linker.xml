@@ -14,5 +14,9 @@
     <assembly fullname="System.ComponentModel.TypeConverter">
         <type fullname="System.ComponentModel.TypeDescriptor" preserve="all"/>
     </assembly>
+    
+    <!-- Preserve MVVM Toolkit reflection-based validation to silence IL2026 -->
+    <assembly fullname="CommunityToolkit.Mvvm" preserve="all"/>
+    
 </linker>
 

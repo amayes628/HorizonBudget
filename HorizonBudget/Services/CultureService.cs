@@ -1,197 +1,86 @@
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Text.Json;
-
-namespace  HorizonBudget.Services;
+using HorizonBudget.Services;
+using static HorizonBudget.Services.LedgerKeyLookupFactory;
 
 public sealed class CultureService : ICultureService
 {
-    private readonly ConcurrentDictionary<string, Dictionary<uint, string>> _cache = new();
-    private string _currentCulture;
+    private const string DefaultCulture = "en";
 
-    // Category translation maps
-    private readonly Dictionary<uint, string> _codeToKey = [];
-    private readonly Dictionary<string, string> _keyToLocalized = [];
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
-    // Domain-specific localization maps
-    private readonly Dictionary<string, string> _localizedApp = [];
-    private readonly Dictionary<string, string> _localizedEnums = [];
-    private readonly Dictionary<string, string> _localizedMessages = [];
-    private readonly Dictionary<string, string> _localizedPages = [];
+    private readonly ConcurrentDictionary<uint, string> _translations = new();
 
     public event Action? CultureChanged;
 
-    public CultureService(string initialCulture)
+    public string CurrentCulture { get; private set; } = DefaultCulture;
+
+    public async Task InitializeAsync(string? culture = null)
     {
-        _currentCulture = Normalize(initialCulture);
-        _ = LoadDefaultTranslations();
-    }
+        CurrentCulture = string.IsNullOrWhiteSpace(culture)
+            ? DefaultCulture
+            : culture;
 
-    public string CurrentCultureCode => _currentCulture;
-
-    // ----------------------------------------------------------------------
-    // CATEGORY TRANSLATION
-    // ----------------------------------------------------------------------
-
-    public string TranslateCategory(uint categoryCode)
-    {
-        // First: find the category key from the flattened category tree
-        if (_codeToKey.TryGetValue(categoryCode, out var key))
-        {
-            // Try localized category name
-            if (_keyToLocalized.TryGetValue(key, out var localized))
-                return localized;
-
-            // Fallback: localized app domain
-            if (_localizedApp.TryGetValue(key, out localized))
-                return localized;
-
-            // Fallback: raw key
-            return key;
-        }
-
-        return $"Category({categoryCode:X8})";
-    }
-
-    public string TranslateCategoryPath(uint categoryCode)
-    {
-        // In the new architecture, categoryCode is not bit-pattern encoded.
-        // The "path" is simply the localized category name.
-        return TranslateCategory(categoryCode);
-    }
-
-    // ----------------------------------------------------------------------
-    // CULTURE MANAGEMENT
-    // ----------------------------------------------------------------------
-
-    public void SetCulture(string cultureCode)
-    {
-        var normalized = Normalize(cultureCode);
-        if (normalized == _currentCulture)
-            return;
-
-        _currentCulture = normalized;
-        ReloadTranslations();
-    }
-
-    public void ReloadTranslations()
-    {
-        _ = LoadDefaultTranslations();
+        await LoadTranslationsAsync(CurrentCulture);
         CultureChanged?.Invoke();
     }
 
-    // ----------------------------------------------------------------------
-    // LOAD TRANSLATIONS
-    // ----------------------------------------------------------------------
-
-    private async Task LoadDefaultTranslations()
+    public async void SetCulture(string culture)
     {
-        // Load category structure
-        await LoadCategoryTreeAsync();
+        if (string.Equals(CurrentCulture, culture, StringComparison.OrdinalIgnoreCase))
+            return;
 
-        // Load culture-specific domain files
-        string culture = _currentCulture;
-
-        await LoadDomainAsync(_localizedApp, "app", $"Resources/Localization/{culture}/app.json");
-        await LoadDomainAsync(_localizedEnums, "enums", $"Resources/Localization/{culture}/enums.json");
-        await LoadDomainAsync(_localizedMessages, "messages", $"Resources/Localization/{culture}/messages.json");
-        await LoadDomainAsync(_localizedPages, "pages", $"Resources/Localization/{culture}/pages.json");
-
-        // Build key → localized lookup
-        _keyToLocalized.Clear();
-        foreach (var kvp in _localizedApp)
-            _keyToLocalized[kvp.Key] = kvp.Value;
-        foreach (var kvp in _localizedEnums)
-            _keyToLocalized[kvp.Key] = kvp.Value;
-        foreach (var kvp in _localizedMessages)
-            _keyToLocalized[kvp.Key] = kvp.Value;
-        foreach (var kvp in _localizedPages)
-            _keyToLocalized[kvp.Key] = kvp.Value;
+        CurrentCulture = culture;
+        await LoadTranslationsAsync(CurrentCulture);
+        CultureChanged?.Invoke();
     }
 
-    // ----------------------------------------------------------------------
-    // CATEGORY TREE LOADING
-    // ----------------------------------------------------------------------
-
-    private async Task LoadCategoryTreeAsync()
+    public string TranslateLedgerKey(uint code)
     {
-        var path = Path.Combine("Resources", "raw");
-        string json = await EmbeddedResourceReader.ReadAsync(path, "categories.json");
-#pragma warning disable SYSLIB0020
-        var rootNodes = JsonSerializer.Deserialize<List<CategoryNode>>(json) ?? [];
-#pragma warning restore SYSLIB0020
-        _codeToKey.Clear();
+        if (_translations.TryGetValue(code, out var value))
+            return value;
 
-        foreach (var (code, key) in FlattenNodes(rootNodes))
-            _codeToKey[code] = key;
+        // Fallback: show hex code if no translation exists
+        return code.ToString("X8", CultureInfo.InvariantCulture);
     }
 
-    private static IEnumerable<(uint Code, string Key)> FlattenNodes(IEnumerable<CategoryNode> nodes)
+    public string TranslateLedgerKeyPath(uint code)
     {
-        foreach (var n in nodes)
+        // For now, path == single translation; later you can expand to full hierarchy
+        return TranslateLedgerKey(code);
+    }
+
+    private async Task LoadTranslationsAsync(string culture)
+    {
+        _translations.Clear();
+
+        var json = await LoadJsonAsync($"Translations/{culture}.json");
+
+        var entries = JsonSerializer.Deserialize<List<RawLedgerNode>>(json, _jsonOptions) ?? [];
+
+        foreach (var entry in entries)
         {
-            uint code = ParseCode(n.Code);
-            yield return (code, n.Key);
-
-            foreach (var child in FlattenNodes(n.Children))
-                yield return child;
+            _translations[entry.CodeValue] = entry.Code;
         }
     }
 
-    private static uint ParseCode(string code)
+    private static async Task<string> LoadJsonAsync(string relativePath)
     {
-        if (code.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
-            return Convert.ToUInt32(code[2..], 16);
-
-        return Convert.ToUInt32(code, 16);
+        // UNO cross-platform asset loading
+        var uri = new Uri($"ms-appx:///Assets/Data/{relativePath}");
+        var file = await StorageFile.GetFileFromApplicationUriAsync(uri);
+        return await FileIO.ReadTextAsync(file);
     }
 
-    // ----------------------------------------------------------------------
-    // DOMAIN LOADING
-    // ----------------------------------------------------------------------
-
-    private static async Task LoadDomainAsync(Dictionary<string, string> dict, string domainName, string path)
+    internal sealed partial record TranslationEntry(string Code, string Name, string Value)
     {
-        dict.Clear();
-
-        string json = await LoadJsonAsync(path,domainName);
-#pragma warning disable SYSLIB0020
-        var root = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(json) ?? [];
-#pragma warning restore SYSLIB0020
-        if (root.TryGetValue(domainName, out var domainDict))
-        {
-            foreach (var kvp in domainDict)
-                dict[kvp.Key] = kvp.Value;
-        }
-    }
-
-    // ----------------------------------------------------------------------
-    // FILE LOADING
-    // ----------------------------------------------------------------------
-
-    private static async Task<string> LoadJsonAsync(string path, string fileName)
-    {
-        return await EmbeddedResourceReader.ReadAsync(path, fileName);
-    }
-
-    private static string Normalize(string culture)
-    {
-        if (string.IsNullOrWhiteSpace(culture))
-            return "en";
-
-        if (culture.Contains('-'))
-            return culture.Split('-')[0];
-
-        return culture;
-    }
-
-    // ----------------------------------------------------------------------
-    // CATEGORY NODE DTO
-    // ----------------------------------------------------------------------
-
-    private sealed class CategoryNode
-    {
-        public string Code { get; set; } = string.Empty;
-        public string Key { get; set; } = string.Empty;
-        public List<CategoryNode> Children { get; set; } = [];
+        public uint CodeValue =>
+            uint.TryParse(Code, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var v)
+                ? v
+                : 0u;
     }
 }

@@ -1,4 +1,4 @@
-<Application x:Class="HorizonBudget.App"
+﻿<Application x:Class="HorizonBudget.App"
        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
        xmlns:utum="using:Uno.Toolkit.UI.Material">
@@ -20,8 +20,7 @@
           </utum:MaterialToolkitTheme.FontOverrideDictionary> -->
         </utum:MaterialToolkitTheme>
       </ResourceDictionary.MergedDictionaries>
-
-      <!-- Add resources here -->
+            <!-- Add resources here -->
 
     </ResourceDictionary>
   </Application.Resources>

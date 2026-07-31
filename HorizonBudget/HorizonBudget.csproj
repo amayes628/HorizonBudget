@@ -3,9 +3,8 @@
         <TargetFrameworks>
             net10.0-desktop;
             net10.0-browserwasm;
-            net10.0-ios
         </TargetFrameworks>
-        <OutputType>Exe</OutputType>
+        <OutputType>WinExe</OutputType>
         <UnoSingleProject>true</UnoSingleProject>
         <LangVersion>14.0</LangVersion>
         <!-- Display name -->
@@ -25,6 +24,7 @@
       https://aka.platform.uno/singleproject-features
     -->
         <UnoFeatures>
+            WinUI;
             Material;
             Dsp;
             Hosting;
@@ -41,7 +41,13 @@
         </UnoFeatures>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Remove="Resources\**" />
+      <EmbeddedResource Remove="Resources\**" />
+      <None Remove="Resources\**" />
+    </ItemGroup>
+    <ItemGroup>
       <Compile Remove="Models\HorizonBudgetJsonContext.cs" />
+      <Compile Remove="Services\CategoryLookupFactory.cs" />
     </ItemGroup>
     
     <ItemGroup>
@@ -50,12 +56,11 @@
 
     <ItemGroup>
         <Folder Include="Assets\Localization\" />
-        <Folder Include="Resources\Styles\" />
-        <Folder Include="ViewModels\" />
     </ItemGroup>
    
     <ItemGroup>
       <PackageReference Include="CommunityToolkit.Mvvm" />
+      <PackageReference Include="CommunityToolkit.WinUI.Extensions" />
       <PackageReference Include="Microsoft.Extensions.Configuration" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
     </ItemGroup>
@@ -87,6 +92,28 @@
         <Page Update="Views\SettingsPage.xaml">
             <Generator>MSBuild:Compile</Generator>
         </Page>
+    </ItemGroup>
+    <ItemGroup>
+      <Page Update="Views\AccountsPage.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+    </ItemGroup>
+    <ItemGroup>
+      <Page Update="Views\ManageAccountPage.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+    </ItemGroup>
+    <ItemGroup>
+      <Content Remove="Resources\**" />
+    </ItemGroup>
+    <ItemGroup>
+      <Page Remove="Resources\**" />
+    </ItemGroup>
+    <ItemGroup>
+      <UpToDateCheckInput Remove="Resources\**" />
+    </ItemGroup>
+    <ItemGroup>
+      <PRIResource Remove="Resources\**" />
     </ItemGroup>
 
 </Project>

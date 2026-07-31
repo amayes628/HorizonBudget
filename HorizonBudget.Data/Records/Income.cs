@@ -8,7 +8,7 @@ public sealed partial record Income
                   string name,
                   decimal amount,
                   decimal variability,
-                  uint categoryId,
+                  uint ledgerId,
                   Recurrence recurrence,
                   DateTime createdOn,
                   DateTime modifiedOn,
@@ -18,7 +18,7 @@ public sealed partial record Income
         Name = name;
         Amount = amount;
         Variability = variability;
-        CategoryId = categoryId;
+        LedgerId = ledgerId;
         Recurrence = recurrence;
         CreatedOn = createdOn;
         ModifiedOn = modifiedOn;
@@ -30,7 +30,7 @@ public sealed partial record Income
     public string Name { get; init; } = string.Empty;
     public decimal Amount { get; init; }
     public decimal Variability { get; init; }
-    public uint CategoryId { get; init; }
+    public uint LedgerId { get; init; }
     public Recurrence Recurrence { get; init; } = Recurrence.None;
     public DateTime CreatedOn { get; init; } = DateTime.UtcNow;
     public DateTime ModifiedOn { get; init; } = DateTime.UtcNow;
@@ -48,7 +48,7 @@ public sealed partial record Income
         Name = "Unassigned Income Source",
         Amount = 0m,
         Variability = 0m,
-        CategoryId = 0u,
+        LedgerId = 0u,
         Recurrence = Recurrence.None,
         CreatedOn = DateTime.UtcNow,
         ModifiedOn = DateTime.UtcNow,

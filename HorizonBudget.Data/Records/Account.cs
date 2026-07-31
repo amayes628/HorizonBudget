@@ -10,9 +10,9 @@ public sealed partial record Account
     public decimal OpeningBalance { get; init; }
     public decimal CurrentBalance { get; init; }
     public decimal ClosingBalance { get; init; }
-    public uint CategoryId { get; init; }
+    public uint LedgerId { get; init; }
     public DateTime CreatedOn { get; init; } = DateTime.UtcNow;
-    public DateTime ModifiedOn { get; init; } = DateTime.UtcNow;
+    public DateTime ModifiedOn { get; set; } = DateTime.UtcNow;
     public EntityStatus Status { get; init; } = EntityStatus.Active;
     public DateOnly? ClosedOn { get; init; }
 
@@ -38,7 +38,7 @@ public sealed partial record Account
         OpeningBalance = openingBalance;
         CurrentBalance = openingBalance; 
         ClosingBalance = openingBalance;
-        CategoryId = categoryId;
+        LedgerId = categoryId;
         Status = EntityStatus.Active;
         ClosedOn = null;
         CreatedOn = DateTime.UtcNow;
@@ -64,7 +64,7 @@ public sealed partial record Account
         OpeningBalance = openingBalance;
         CurrentBalance = currentBalance;
         ClosingBalance = closingBalance;
-        CategoryId = categoryId;
+        LedgerId = categoryId;
         Status = accountStatus;
         ClosedOn = closedOn;
         CreatedOn = createdOn;
@@ -86,7 +86,7 @@ public sealed partial record Account
         OpeningBalance = 0m,
         CurrentBalance = 0m,
         ClosingBalance = 0m,
-        CategoryId = 0u,
+        LedgerId = 0u,
         CreatedOn = DateTime.UtcNow,
         ModifiedOn = DateTime.UtcNow,
         Status = EntityStatus.Active,

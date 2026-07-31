@@ -11,7 +11,7 @@ public sealed partial record Expense
                    decimal variability,
                    bool isEssential,
                    DateOnly? nextDueDate,
-                   uint categoryId,
+                   uint ledgerId,
                    Recurrence recurrence,
                    DateTime createdOn,
                    DateTime modifiedOn,
@@ -23,7 +23,7 @@ public sealed partial record Expense
         Variability = variability;
         IsEssential = isEssential;
         NextDueDate = nextDueDate;
-        CategoryId = categoryId;
+        LedgerId = ledgerId;
         Recurrence = recurrence;
         CreatedOn = createdOn;
         ModifiedOn = modifiedOn;
@@ -40,7 +40,7 @@ public sealed partial record Expense
     public decimal Variability { get; init; }
     public bool IsEssential { get; init; }
     public DateOnly? NextDueDate { get; init; }
-    public uint CategoryId { get; init; }
+    public uint LedgerId { get; init; }
     public Recurrence Recurrence { get; init; } = Recurrence.None;
     public DateTime CreatedOn { get; init; } = DateTime.UtcNow;
     public DateTime ModifiedOn { get; init; } = DateTime.UtcNow;
@@ -57,7 +57,7 @@ public sealed partial record Expense
         Variability = 0m,
         IsEssential = false,
         NextDueDate = null,
-        CategoryId = 0u,
+        LedgerId = 0u,
         Recurrence = Recurrence.None,
         CreatedOn = DateTime.UtcNow,
         ModifiedOn = DateTime.UtcNow,

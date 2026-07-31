@@ -9,6 +9,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Extensions" Version="8.2.251219" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.10" />

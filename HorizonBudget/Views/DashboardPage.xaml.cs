@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using HorizonBudget.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -25,5 +26,12 @@ public sealed partial class DashboardPage : Page
     public DashboardPage()
     {
         InitializeComponent();
+    }
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+        // Optionally, you can handle any initialization when the page is navigated to
+        // The navigation pipeline sets DataContext to the VM it created.
+        var ViewModel = DataContext as DashboardViewModel;
     }
 }

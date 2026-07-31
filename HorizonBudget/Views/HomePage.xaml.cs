@@ -1,17 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using HorizonBudget.ViewModels;
+using HorizonBudget.Views.Pages;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -22,13 +10,23 @@ namespace HorizonBudget.Views;
 /// </summary>
 public sealed partial class HomePage : Page
 {
+    public HomeViewModel? ViewModel => DataContext as HomeViewModel;
     public HomePage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
         // Load default page
-        ContentFrame.Navigate(typeof(DashboardPage));
+
+        mainpage.Navigate(typeof(DashboardPage));
     }
-    private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+        // Optionally, you can handle any initialization when the page is navigated to
+        // The navigation pipeline sets DataContext to the VM it created.
+        var ViewModel = DataContext as HomeViewModel;
+    }
+
+    private void NavView_SelectionChanged(NavigationView _, NavigationViewSelectionChangedEventArgs args)
     {
         if (args.SelectedItem is not NavigationViewItem item)
             return;
@@ -37,11 +35,11 @@ public sealed partial class HomePage : Page
         {
             case "home":
             case "dashboard":
-                ContentFrame.Navigate(typeof(DashboardPage));
+                mainpage.Navigate(typeof(DashboardPage));
                 break;
 
             case "accounts":
-                //ContentFrame.Navigate(typeof(AccountsPage));
+                mainpage.Navigate(typeof(AccountsPage));
                 break;
 
             case "expenses":

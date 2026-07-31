@@ -1,32 +1,32 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using HorizonBudget.Data;
 using HorizonBudget.Data.Records;
 using HorizonBudget.Services;
+using HorizonBudget.ViewModels;
 using HorizonBudget.Views;
+using HorizonBudget.Views.Pages;
 using Microsoft.EntityFrameworkCore;
+using Uno.UI.Extensions;
 
 namespace HorizonBudget;
 
 public partial class App : Application
 {
-    /// <summary>
-    /// Initializes the singleton application object. This is the first line of authored code
-    /// executed, and as such is the logical equivalent of main() or WinMain().
-    /// </summary>
     public App()
     {
         InitializeComponent();
     }
 
     protected Window? MainWindow { get; private set; }
-    protected IHost? Host { get; private set; }
+    public IHost? Host { get; private set; }
 
-    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(
-    "Trimming", "IL2026",
-    Justification = "Uno.Extensions.Localization is safe in HorizonBudget; required converters are preserved.")]
-    protected override void OnLaunched(LaunchActivatedEventArgs args)
+    [UnconditionalSuppressMessage(
+        "Trimming", "IL2026",
+        Justification = "Uno.Extensions.Localization is safe in HorizonBudget; required converters are preserved.")]
+    protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
-        // Build host (logging, config, localization, DI)
+        // Build host (logging, config, localization, DI, navigation)
         var builder = this.CreateBuilder(args)
             .Configure(host => host
 #if DEBUG
@@ -41,8 +41,8 @@ public partial class App : Application
                                 LogLevel.Warning)
                         .CoreLogLevel(LogLevel.Warning);
                 })
-
                 .UseLocalization()
+                .UseNavigation(RegisterRoutes)
                 .UseHttp((context, services) =>
                 {
 #if DEBUG
@@ -51,21 +51,29 @@ public partial class App : Application
                 })
                 .ConfigureServices((context, services) =>
                 {
+                    // EF Core
                     services.AddDbContextFactory<HorizonBudgetContext>(options =>
                     {
                         options.UseSqlite("Data Source=horizon.db");
                     });
                     services.AddTransient<DatabaseInitializer>();
+
                     // Services
                     services.AddSingleton<ICultureService, CultureService>();
-                    //services.AddSingleton<IRecordRepository<Account>, AccountRepository>();
+                    services.AddSingleton<ILedgerKeyLookupFactory, LedgerKeyLookupFactory>();
 
-                    // Factories
-                    services.AddSingleton<CategoryLookupFactory>();
+                    // Repositories
+                    services.AddScoped<IRecordRepository<Account>, RecordRepository<Account>>();
+                    services.AddScoped<IRecordRepository<Expense>, RecordRepository<Expense>>();
+                    services.AddScoped<IRecordRepository<Income>, RecordRepository<Income>>();
+                    services.AddScoped<IRecordRepository<Transaction>, RecordRepository<Transaction>>();
                 })
             );
 
-        // Create the window
+        // Build the host once
+        Host = builder.Build();
+        
+        // Create the window (builder.Window is available from the builder)
         MainWindow = builder.Window;
 
 #if DEBUG
@@ -73,42 +81,57 @@ public partial class App : Application
 #endif
 
         MainWindow.SetWindowIcon();
-        // start up tasks
-        // Build the app/ host
-        var app = builder.Build();
 
-        // Correct DI scope
-        using (var scope = app.Services.CreateScope())
+        // Initialize database
+        using (var scope = Host.Services.CreateScope())
         {
             var initializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
             initializer.Initialize();
         }
-        // YOUR ROOT UI PAGE
-        var homePage = new HomePage();
 
-        // Assign root page to window
-        MainWindow.Content = homePage;
+        await builder.NavigateAsync<HomePage>();
 
-        // Activate window
+        // Activate window after frame DataContext are set
         MainWindow.Activate();
     }
 
+
     private static void RegisterRoutes(IViewRegistry views, IRouteRegistry routes)
     {
+        Debug.WriteLine("RegisterRoutes being called");
+        // 1. REGISTER VIEWS AND CORRESPONDING VIEWMODELS CLEANLY
         views.Register(
-            new ViewMap(ViewModel: typeof(ShellModel)),
-            new ViewMap<MainPage, MainModel>(),
-            new DataViewMap<SecondPage, SecondModel, Entity>()
-        );
+        new ViewMap<HomePage, HomeViewModel>(),
+        new ViewMap<DashboardPage, DashboardViewModel>(),
+        new ViewMap<AccountsPage, AccountsViewModel>(),
+        new ViewMap<ManageAccountPage, ManageAccountViewModel>(),
+        new DataViewMap<ManageAccountPage, ManageAccountViewModel, Account>(),
+        new ViewMap<AboutPage>(),
+        new ViewMap<HelpPage>(),
+        new ViewMap<SettingsPage>()
+            );
 
+        Debug.WriteLine("RouteMap being initialized");
+        // 2. DEFINE THE ROUTE PIPELINE & NESTED REGION HIERARCHY
         routes.Register(
-            new RouteMap("", View: views.FindByViewModel<ShellModel>(),
-                Nested:
-                [
-                    new ("Main", View: views.FindByViewModel<MainModel>(), IsDefault:true),
-                    new ("Second", View: views.FindByViewModel<SecondModel>()),
-                ]
-            )
+        // The base application route maps to your root window host (HomeView)
+        new RouteMap(
+        "Home",
+        View: views.FindByViewModel<HomeViewModel>(),
+        Nested:
+        [
+                 // These routes populate the Frame inside HomePage's uen:Region
+            new RouteMap("Dashboard", View: views.FindByViewModel<DashboardViewModel>(), IsDefault: true),
+            new RouteMap("Accounts", View: views.FindByViewModel<AccountsViewModel>()),
+            new RouteMap("ManageAccount", View: views.FindByViewModel<ManageAccountViewModel>()),
+            new RouteMap("About", View: views.FindByView<AboutPage>()),
+            new RouteMap("Help", View: views.FindByView<HelpPage>()),
+            new RouteMap("Settings", View: views.FindByView<SettingsPage>())
+        ]
+        )
         );
     }
+
+    public static T GetService<T>() where T : class =>
+        ((App)Current).Host!.Services.GetRequiredService<T>();
 }

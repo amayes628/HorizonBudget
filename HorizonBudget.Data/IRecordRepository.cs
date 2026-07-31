@@ -1,4 +1,4 @@
-namespace  HorizonBudget.Services;
+namespace HorizonBudget.Data;
 
 /// <summary>
 /// A dedicated repository structure for modern, immutable record-backed entities.

@@ -5,6 +5,7 @@
     xmlns:local="using:HorizonBudget.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:uen="using:Uno.Extensions.Navigation.UI"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -86,7 +87,7 @@
         </NavigationView>
 
         <!-- RIGHT CONTENT FRAME -->
-        <Frame x:Name="ContentFrame"
+        <Frame x:Name="mainpage" uen:Region.Attached="True"
                Grid.Column="1"/>
     </Grid>
 </Page>
