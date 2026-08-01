@@ -8,6 +8,7 @@
     }
   },
   "profiles": {
+
     // This profile is first in order for dotnet run to pick it up by default
     "HorizonBudget (WebAssembly)": {
       "commandName": "Project",
