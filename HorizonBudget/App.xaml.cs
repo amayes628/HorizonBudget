@@ -43,12 +43,6 @@ public partial class App : Application
                 })
                 .UseLocalization()
                 .UseNavigation(RegisterRoutes)
-                .UseHttp((context, services) =>
-                {
-#if DEBUG
-                    services.AddTransient<DelegatingHandler, DebugHttpHandler>();
-#endif
-                })
                 .ConfigureServices((context, services) =>
                 {
                     // EF Core

@@ -1,48 +1,217 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System;
+using HorizonBudget.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace HorizonBudget.Data.Migrations
+namespace HorizonBudget.Data.Migrations;
+
+[DbContext(typeof(HorizonBudgetContext))]
+[Migration("20260729225535_CategoryId2LedgerId")]
+partial class CategoryId2LedgerId
 {
     /// <inheritdoc />
-    public partial class CategoryId2LedgerId : Migration
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
+#pragma warning disable 612, 618
+        modelBuilder.HasAnnotation("ProductVersion", "10.0.10");
+
+        modelBuilder.Entity("HorizonBudget.Data.Records.Account", b =>
         {
-            migrationBuilder.RenameColumn(
-                name: "CategoryId",
-                table: "Incomes",
-                newName: "LedgerId");
+            b.Property<Guid>("Id")
+                .ValueGeneratedOnAdd()
+                .HasColumnType("TEXT");
 
-            migrationBuilder.RenameColumn(
-                name: "CategoryId",
-                table: "Expenses",
-                newName: "LedgerId");
+            b.Property<string>("AccountNumberSuffix")
+                .IsRequired()
+                .HasColumnType("TEXT");
 
-            migrationBuilder.RenameColumn(
-                name: "CategoryId",
-                table: "Accounts",
-                newName: "LedgerId");
-        }
+            b.Property<DateOnly?>("ClosedOn")
+                .HasColumnType("TEXT");
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
+            b.Property<decimal>("ClosingBalance")
+                .HasColumnType("TEXT");
+
+            b.Property<DateTime>("CreatedOn")
+                .HasColumnType("TEXT");
+
+            b.Property<decimal>("CurrentBalance")
+                .HasColumnType("TEXT");
+
+            b.Property<uint>("LedgerId")
+                .HasColumnType("INTEGER");
+
+            b.Property<DateTime>("ModifiedOn")
+                .HasColumnType("TEXT");
+
+            b.Property<string>("Name")
+                .IsRequired()
+                .HasColumnType("TEXT");
+
+            b.Property<decimal>("OpeningBalance")
+                .HasColumnType("TEXT");
+
+            b.Property<int>("Status")
+                .HasColumnType("INTEGER");
+
+            b.HasKey("Id");
+
+            b.ToTable("Accounts");
+        });
+
+        modelBuilder.Entity("HorizonBudget.Data.Records.Expense", b =>
         {
-            migrationBuilder.RenameColumn(
-                name: "LedgerId",
-                table: "Incomes",
-                newName: "CategoryId");
+            b.Property<Guid>("Id")
+                .ValueGeneratedOnAdd()
+                .HasColumnType("TEXT");
 
-            migrationBuilder.RenameColumn(
-                name: "LedgerId",
-                table: "Expenses",
-                newName: "CategoryId");
+            b.Property<decimal>("Amount")
+                .HasColumnType("TEXT");
 
-            migrationBuilder.RenameColumn(
-                name: "LedgerId",
-                table: "Accounts",
-                newName: "CategoryId");
-        }
+            b.Property<DateTime>("CreatedOn")
+                .HasColumnType("TEXT");
+
+            b.Property<bool>("IsEssential")
+                .HasColumnType("INTEGER");
+
+            b.Property<uint>("LedgerId")
+                .HasColumnType("INTEGER");
+
+            b.Property<DateTime>("ModifiedOn")
+                .HasColumnType("TEXT");
+
+            b.Property<string>("Name")
+                .IsRequired()
+                .HasColumnType("TEXT");
+
+            b.Property<DateOnly?>("NextDueDate")
+                .HasColumnType("TEXT");
+
+            b.Property<Guid>("RecurrenceId")
+                .HasColumnType("TEXT");
+
+            b.Property<decimal>("Variability")
+                .HasColumnType("TEXT");
+
+            b.HasKey("Id");
+
+            b.HasIndex("RecurrenceId");
+
+            b.ToTable("Expenses");
+        });
+
+        modelBuilder.Entity("HorizonBudget.Data.Records.Income", b =>
+        {
+            b.Property<Guid>("Id")
+                .ValueGeneratedOnAdd()
+                .HasColumnType("TEXT");
+
+            b.Property<decimal>("Amount")
+                .HasColumnType("TEXT");
+
+            b.Property<DateTime>("CreatedOn")
+                .HasColumnType("TEXT");
+
+            b.Property<uint>("LedgerId")
+                .HasColumnType("INTEGER");
+
+            b.Property<DateTime>("ModifiedOn")
+                .HasColumnType("TEXT");
+
+            b.Property<string>("Name")
+                .IsRequired()
+                .HasColumnType("TEXT");
+
+            b.Property<Guid>("RecurrenceId")
+                .HasColumnType("TEXT");
+
+            b.Property<decimal>("Variability")
+                .HasColumnType("TEXT");
+
+            b.HasKey("Id");
+
+            b.HasIndex("RecurrenceId");
+
+            b.ToTable("Incomes");
+        });
+
+        modelBuilder.Entity("HorizonBudget.Data.Records.Recurrence", b =>
+        {
+            b.Property<Guid>("Id")
+                .ValueGeneratedOnAdd()
+                .HasColumnType("TEXT");
+
+            b.Property<DateTime>("CreatedOn")
+                .HasColumnType("TEXT");
+
+            b.Property<int>("Interval")
+                .HasColumnType("INTEGER");
+
+            b.Property<DateOnly>("StartDate")
+                .HasColumnType("TEXT");
+
+            b.Property<int>("Unit")
+                .HasColumnType("INTEGER");
+
+            b.HasKey("Id");
+
+            b.ToTable("Recurrences");
+        });
+
+        modelBuilder.Entity("HorizonBudget.Data.Records.Transaction", b =>
+        {
+            b.Property<Guid>("Id")
+                .ValueGeneratedOnAdd()
+                .HasColumnType("TEXT");
+
+            b.Property<decimal>("Amount")
+                .HasColumnType("TEXT");
+
+            b.Property<DateTime>("Date")
+                .HasColumnType("TEXT");
+
+            b.Property<string>("Description")
+                .IsRequired()
+                .HasColumnType("TEXT");
+
+            b.Property<Guid>("SourceAccountId")
+                .HasColumnType("TEXT");
+
+            b.Property<Guid>("TargetAccountId")
+                .HasColumnType("TEXT");
+
+            b.Property<int>("Type")
+                .HasColumnType("INTEGER");
+
+            b.HasKey("Id");
+
+            b.ToTable("Transactions");
+        });
+
+        modelBuilder.Entity("HorizonBudget.Data.Records.Expense", b =>
+        {
+            b.HasOne("HorizonBudget.Data.Records.Recurrence", "Recurrence")
+                .WithMany()
+                .HasForeignKey("RecurrenceId")
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
+
+            b.Navigation("Recurrence");
+        });
+
+        modelBuilder.Entity("HorizonBudget.Data.Records.Income", b =>
+        {
+            b.HasOne("HorizonBudget.Data.Records.Recurrence", "Recurrence")
+                .WithMany()
+                .HasForeignKey("RecurrenceId")
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
+
+            b.Navigation("Recurrence");
+        });
+#pragma warning restore 612, 618
     }
 }

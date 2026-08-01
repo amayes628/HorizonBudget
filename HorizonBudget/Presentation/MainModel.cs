@@ -1,8 +1,12 @@
+
 namespace HorizonBudget.Presentation;
 
-public partial record MainModel
+public partial class MainModel : ObservableObject
 {
-    private INavigator _navigator;
+    private readonly INavigator _navigator;
+
+    [ObservableProperty]
+    private string name = string.Empty;
 
     public MainModel(
         IStringLocalizer localizer,
@@ -10,19 +14,18 @@ public partial record MainModel
         INavigator navigator)
     {
         _navigator = navigator;
-        Title = "Main";
-        Title += $" - {localizer["ApplicationName"]}";
-        Title += $" - {appInfo?.Value?.Environment}";
+
+        Title = $"Main - {localizer["ApplicationName"]} - {appInfo?.Value?.Environment}";
     }
 
     public string? Title { get; }
 
-    public IState<string> Name => State<string>.Value(this, () => string.Empty);
-
+    [RelayCommand]
     public async Task GoToSecond()
     {
-        var name = await Name;
-        await _navigator.NavigateViewModelAsync<SecondModel>(this, data: new Entity(name!));
+        await _navigator.NavigateViewModelAsync<SecondModel>(
+            this,
+            data: new Entity(Name)
+        );
     }
-
 }

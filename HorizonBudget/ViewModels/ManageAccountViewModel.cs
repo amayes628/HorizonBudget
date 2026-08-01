@@ -1,13 +1,10 @@
 using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using HorizonBudget.Data;
 using HorizonBudget.Data.Records;
 using HorizonBudget.Data.Types;
 using HorizonBudget.Services;
 using HorizonBudget.Validation;
 using HorizonBudget.Views;
-using HorizonBudget.Views.Pages;
 
 namespace HorizonBudget.ViewModels;
 
@@ -47,7 +44,7 @@ public partial class ManageAccountViewModel : ObservableValidator
     public partial Account Account { get; set; } = new();
     [ObservableProperty]
     public partial uint SelectedLedgerCode { get; set; }
-    [ObservableProperty] public partial EntityStatus Status { get; set; }
+    [ObservableProperty] public partial LedgerStatus Status { get; set; }
     #endregion
 
     #region Ledger Suggestions
@@ -111,12 +108,7 @@ public partial class ManageAccountViewModel : ObservableValidator
 
             Account = new Account
             {
-                Status = EntityStatus.Active,
-                CreatedOn = DateTime.UtcNow,
-                ModifiedOn = DateTime.UtcNow,
                 OpeningBalance = 0,
-                CurrentBalance = 0,
-                ClosingBalance = 0
             };
 
             SelectedLedgerCode = 0;
@@ -202,14 +194,13 @@ public partial class ManageAccountViewModel : ObservableValidator
             ShowTip(ValidationMessages.CorrectHighlightedFields);
             return;
         }
-        var newAccount = new Account
-        {
-            CurrentBalance = Account.OpeningBalance,
-            ClosingBalance = Account.OpeningBalance,
-            CreatedOn = DateTime.UtcNow,
-            ModifiedOn = Account.CreatedOn,
-            Status = EntityStatus.Active,
-        };
+        var newAccount = new Account(
+            name: Account.Name,
+            accountNumberSuffix: Account.AccountNumberSuffix,
+            openingBalance: Account.OpeningBalance,
+            ledgerId: SelectedLedgerCode
+        );
+        
         await _accounts.AddAsync(newAccount);
 
         await _navigator.NavigateViewAsync<AccountsPage>(this);
@@ -231,8 +222,7 @@ public partial class ManageAccountViewModel : ObservableValidator
             return;
         }
 
-        Account.ModifiedOn = DateTime.UtcNow;
-
+        Account = Account.Touch(Account);   // ✔ domain logic
         await _accounts.UpdateAsync(Account);
 
         await _navigator.NavigateViewAsync<AccountsPage>(this);
@@ -255,14 +245,7 @@ public partial class ManageAccountViewModel : ObservableValidator
     [RelayCommand]
     private async Task ConfirmCloseAsync()
     {
-        Account = Account with
-        {
-            Status = EntityStatus.Closed,
-            ClosingBalance = 0,
-            ClosedOn = DateOnly.FromDateTime(DateTime.UtcNow),
-            ModifiedOn = DateTime.UtcNow
-        };
-        Account.ModifiedOn = DateTime.UtcNow;
+        Account = Account.Close();
 
         await _accounts.UpdateAsync(Account);
 

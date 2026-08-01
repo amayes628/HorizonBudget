@@ -1,7 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Security.Principal;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using HorizonBudget.Data;
 using HorizonBudget.Data.Records;
 using HorizonBudget.Services;

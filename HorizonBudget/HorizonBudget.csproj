@@ -47,7 +47,13 @@
     </UnoFeatures>
   </PropertyGroup>
   <ItemGroup>
-    <Page Remove="_App.xaml" />
+    <None Remove="Styles\ColorPaletteOverride.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HorizonBudget.Data\HorizonBudget.Data.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Remove="Styles\ColorPaletteOverride.xaml" />
   </ItemGroup>
 
 </Project>
